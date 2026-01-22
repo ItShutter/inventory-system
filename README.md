@@ -1,0 +1,2 @@
+# inventory-system
+Manage products
