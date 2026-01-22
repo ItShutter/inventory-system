@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #{{ t.id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #eee; font-family: 'Sarabun', sans-serif; }
+        .invoice-box {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            background: white;
+            min-height: 29.7cm; /* ขนาด A4 */
+        }
+        /* ซ่อนปุ่มเวลาสั่งปริ้นท์ */
+        @media print {
+            .no-print { display: none; }
+            body { background: white; margin: 0; }
+            .invoice-box { box-shadow: none; border: 0; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="text-center mt-3 no-print">
+    <button onclick="window.print()" class="btn btn-primary btn-lg">🖨️ Print Invoice</button>
+    <a href="{{ url_for('history') }}" class="btn btn-secondary btn-lg">🔙 Back</a>
+</div>
+
+<div class="invoice-box">
+    <div class="row mb-4">
+        <div class="col-8">
+            <h2 class="text-primary">📦 ItShutter Inventory</h2>
+            <p><strong>INVOICE / DELIVERY NOTE</strong></p>
+        </div>
+        <div class="col-4 text-end">
+            <h4 class="text-secondary">#INV-{{ "%04d" | format(t.id) }}</h4>
+            <p class="mb-0">Date: {{ t.timestamp.strftime('%d/%m/%Y') }}</p>
+            <p>Time: {{ t.timestamp.strftime('%H:%M') }}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row mb-4">
+        <div class="col-6">
+            <h5 class="fw-bold">Bill To (Customer):</h5>
+            {% if customer %}
+                <p class="mb-1"><strong>{{ customer.name }}</strong></p>
+                <p class="mb-1">{{ customer.address or '-' }}</p>
+                <p class="mb-1">Tel: {{ customer.phone or '-' }}</p>
+                <p>Email: {{ customer.email or '-' }}</p>
+            {% else %}
+                <p><strong>{{ t.party_name }}</strong></p>
+                <p class="text-muted">(No address details found)</p>
+            {% endif %}
+        </div>
+        <div class="col-6 text-end">
+            <h5 class="fw-bold">Issued By:</h5>
+            <p>{{ t.user_name }} (Admin)</p>
+            <span class="badge bg-{{ 'danger' if t.transaction_type == 'OUT' else 'success' }} fs-6">
+                {{ 'SALES / OUT' if t.transaction_type == 'OUT' else 'PURCHASE / IN' }}
+            </span>
+        </div>
+    </div>
+
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 15%">SKU</th>
+                <th>Description</th>
+                <th class="text-center" style="width: 15%">Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ t.sku }}</td>
+                <td>{{ t.product_name }}</td>
+                <td class="text-center fs-5 fw-bold">{{ t.quantity }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="row mt-5 pt-5 text-center">
+        <div class="col-6">
+            <br><br>
+            <hr style="width: 60%; margin: auto;">
+            <p>Receiver Signature</p>
+            <p>(............................................)</p>
+        </div>
+        <div class="col-6">
+            <br><br>
+            <hr style="width: 60%; margin: auto;">
+            <p>Authorized Signature</p>
+            <p>(           {{ t.user_name }}           )</p>
+        </div>
+    </div>
+    
+    <div class="text-center mt-5 text-muted small">
+        <p>Thank you for your business!</p>
+        <p>ItShutter.com - IT Support & Services</p>
+    </div>
+</div>
+
+</body>
+</html>
