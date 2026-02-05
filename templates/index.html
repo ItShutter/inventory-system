@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background-color: #343a40;
+            color: white;
+            position: fixed;
+        }
+
+        .sidebar a {
+            color: #c2c7d0;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            border-bottom: 1px solid #4b545c;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding-bottom: 50px;
+        }
+
+        .top-navbar {
+            background-color: #28a745;
+            padding: 15px;
+            color: white;
+        }
+
+        .stat-card {
+            color: white;
+            border-radius: 5px;
+            height: 120px;
+            position: relative;
+            padding: 20px;
+        }
+
+        .bg-blue {
+            background-color: #17a2b8;
+        }
+
+        .bg-green {
+            background-color: #28a745;
+        }
+
+        .bg-orange {
+            background-color: #ffc107;
+            color: #1f2d3d !important;
+        }
+
+        .bg-red {
+            background-color: #dc3545;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 3.5rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="p-3 text-center border-bottom border-secondary">
+            <h4 class="mb-0">📦 Inventory</h4>
+            <small>System V.2</small>
+        </div>
+        {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('main.settings') }}" class="text-white bg-secondary mt-3">
+            <i class="fas fa-cogs me-2"></i> Settings
+        </a>
+        {% endif %}
+        <div class="p-3 border-bottom border-secondary">
+            <span>👤 {{ current_user.username }} ({{ current_user.role }})</span>
+        </div>
+
+        <nav class="mt-2">
+            <a href="{{ url_for('main.index') }}" class="active">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+            <a href="{{ url_for('main.report') }}">
+                <i class="fas fa-chart-line me-2"></i> Sales Report
+            </a>
+            <a href="{{ url_for('main.customers') }}">
+                <i class="fas fa-users me-2"></i> Customers
+            </a>
+            <a href="{{ url_for('main.suppliers') }}">
+                <i class="fas fa-truck me-2"></i> Suppliers
+            </a>
+            <a href="{{ url_for('transactions.history') }}">
+                <i class="fas fa-history me-2"></i> History Log
+            </a>
+            {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('auth.manage_users') }}" class="text-warning">
+                <i class="fas fa-user-shield me-2"></i> Manage Users
+            </a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}" class="text-danger mt-3">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div class="top-navbar d-flex justify-content-between align-items-center shadow-sm">
+            <div class="fs-4"><i class="fas fa-bars"></i> Stock Overview</div>
+            {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('products.add_product') }}" class="btn btn-light text-success fw-bold shadow-sm">
+                <i class="fas fa-plus"></i> Add Product
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="container-fluid mt-4">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <div class="row g-3 mb-4">
+                <div class="col-lg-3 col-6">
+                    <div class="stat-card bg-blue shadow-sm">
+                        <h3>{{ total_products }}</h3>
+                        <p>Products</p><i class="fas fa-box stat-icon"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="stat-card bg-green shadow-sm">
+                        <h3>{{ total_quantity }}</h3>
+                        <p>Units</p><i class="fas fa-cubes stat-icon"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="stat-card bg-orange shadow-sm">
+                        <h3>{{ low_stock }}</h3>
+                        <p>Low Stock</p><i class="fas fa-exclamation-triangle stat-icon"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="stat-card bg-red shadow-sm">
+                        <h3>{{ out_of_stock }}</h3>
+                        <p>Out of Stock</p><i class="fas fa-times-circle stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0 text-secondary"><i class="fas fa-chart-pie me-2"></i> Categories</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="categoryChart" style="max-height: 250px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0 text-secondary"><i class="fas fa-chart-bar me-2"></i> Top 5 Moving Products
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="topProductChart" style="max-height: 250px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-secondary"><i class="fas fa-list me-2"></i> Product List</h5>
+                        <form action="{{ url_for('main.index') }}" method="GET" class="d-flex" style="width: 300px;">
+                            <input type="text" name="q" class="form-control form-control-sm me-2"
+                                placeholder="Search..." value="{{ request.args.get('q', '') }}">
+                            <button class="btn btn-sm btn-outline-secondary" type="submit">Search</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Image</th>
+                                <th>SKU</th>
+                                <th>Category</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th style="min-width: 150px;">Stock</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr class="{% if product.current_quantity < product.min_quantity %}table-danger{% endif %}">
+                                <td class="ps-4">
+                                    {% if product.image_url %}
+                                    <img src="{{ url_for('static', filename='uploads/' + product.image_url) }}"
+                                        style="width: 40px; height: 40px; object-fit: cover;" class="rounded border">
+                                    {% else %}<div class="bg-secondary rounded" style="width: 40px; height: 40px;">
+                                    </div>{% endif %}
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ product.sku }}</span></td>
+                                <td><span class="badge bg-info text-dark">{{ product.category }}</span></td>
+                                <td class="fw-bold">{{ product.name }}</td>
+
+                                <td>
+                                    {% if current_user.role == 'admin' %}
+                                    <div style="font-size: 0.9rem;">
+                                        <span class="text-muted">Buy:</span> {{ "{:,.2f}".format(product.cost_price) }}
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="text-success fw-bold" style="font-size: 0.95rem;">
+                                        <span class="text-dark">Sell:</span> {{ "{:,.2f}".format(product.selling_price) }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span
+                                            class="badge {{ 'bg-danger' if product.current_quantity < product.min_quantity else 'bg-success' }} me-3"
+                                            style="font-size: 1rem; min-width: 40px;">{{ product.current_quantity }}</span>
+                                        <button class="btn btn-success btn-sm me-1"
+                                            onclick="openModal('{{ product.id }}', '{{ product.name | replace("'", "\\'") }}', 'IN')"><i
+                                                class="fas fa-plus"></i></button>
+                                        <button class="btn btn-outline-danger btn-sm"
+                                            onclick="openModal('{{ product.id }}', '{{ product.name | replace("'", "\\'") }}', 'OUT')"><i
+                                                class="fas fa-minus"></i></button>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('products.product_detail', product_id=product.id) }}"
+                                        class="btn btn-info btn-sm text-white"><i class="fas fa-eye"></i></a>
+                                    {% if current_user.role == 'admin' %}
+                                    <a href="{{ url_for('products.edit_product', product_id=product.id) }}"
+                                        class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>
+                                    <a href="{{ url_for('products.delete_product', product_id=product.id) }}"
+                                        class="btn btn-danger btn-sm" onclick="return confirm('Delete?');"><i
+                                            class="fas fa-trash"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer bg-white py-3 d-flex justify-content-end align-items-center">
+                    <a href="{{ url_for('products.export_data') }}" class="btn btn-success btn-sm me-2"><i
+                            class="fas fa-file-excel"></i> Export</a>
+
+                    {% if current_user.role == 'admin' %}
+                    <button type="button" class="btn btn-warning btn-sm me-2 text-white" data-bs-toggle="modal"
+                        data-bs-target="#bulkImageModal">
+                        <i class="fas fa-images"></i> Bulk Images
+                    </button>
+
+                    <form action="{{ url_for('products.import_data') }}" method="POST" enctype="multipart/form-data"
+                        class="d-flex">
+                        <input type="file" name="file" class="form-control form-control-sm me-2" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Import Excel</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="stockModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="stockForm" method="POST">
+                    <div class="modal-header text-white" id="modalHeader">
+                        <h5 class="modal-title">Update Stock</h5><button type="button" class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5 id="productName" class="text-center mb-3"></h5>
+                        <input type="hidden" name="type" id="txnType">
+                        <div class="mb-3"><label>Quantity</label><input type="number" name="quantity"
+                                class="form-control" value="1" min="1" required></div>
+                        <div class="mb-3">
+                            <label>Party Name (Customer/Supplier)</label>
+                            <select name="party_name" class="form-select">
+                                <option value="-">General</option>
+                                {% for c in customers %}<option value="{{ c.name }}">{{ c.name }} (Customer)</option>{%
+                                endfor %}
+                                {% for s in suppliers %}<option value="{{ s.name }}">{{ s.name }} (Supplier)</option>{%
+                                endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><button type="submit" class="btn btn-primary">Confirm</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bulkImageModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ url_for('products.bulk_upload_images') }}" method="POST" enctype="multipart/form-data">
+                    <div class="modal-header bg-warning text-white">
+                        <h5 class="modal-title"><i class="fas fa-images"></i> Bulk Image Upload</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="small text-muted">
+                            Upload multiple images at once. <br>
+                            <strong>Rule:</strong> Filename must match SKU exactly (e.g. <code>A001.jpg</code> for SKU
+                            "A001").
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label">Select Images</label>
+                            <input type="file" name="images" class="form-control" multiple accept="image/*" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning text-white">Start Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openModal(id, name, type) {
+            document.getElementById('stockForm').action = "/update_stock/" + id;
+            document.getElementById('productName').innerText = name;
+            document.getElementById('txnType').value = type;
+            document.getElementById('modalHeader').className = type === 'IN' ? 'modal-header bg-success text-white' : 'modal-header bg-danger text-white';
+            new bootstrap.Modal(document.getElementById('stockModal')).show();
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // รับข้อมูลจาก Python มาเป็น JSON
+        const catLabels = {{ cat_labels | tojson }};
+        const catData = {{ cat_data | tojson }};
+        const topLabels = {{ top_labels | tojson }};
+        const topData = {{ top_data | tojson }};
+
+        // 1. สร้าง Pie Chart
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: catLabels,
+                datasets: [{
+                    data: catData,
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+
+        // 2. สร้าง Bar Chart
+        new Chart(document.getElementById('topProductChart'), {
+            type: 'bar',
+            data: {
+                labels: topLabels,
+                datasets: [{
+                    label: 'Units Sold (OUT)',
+                    data: topData,
+                    backgroundColor: '#36b9cc',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    </script>
+</body>
+
+</html>
