@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/lux/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Add New Product</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+                        
+                        <div class="mb-3">
+                            <label for="sku" class="form-label">SKU (Code) *</label>
+                            <input type="text" class="form-control" id="sku" name="sku" placeholder="e.g. A001" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Product Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Wireless Mouse" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Category (หมวดหมู่)</label>
+                            <select name="category" class="form-select" required>
+                                <option value="" disabled selected>-- Select Category --</option>
+                                <option value="CPU" {% if product and product.category == 'CPU' %}selected{% endif %}>CPU (Processor)</option>
+                                <option value="Motherboard" {% if product and product.category == 'Motherboard' %}selected{% endif %}>Motherboard</option>
+                                <option value="RAM" {% if product and product.category == 'RAM' %}selected{% endif %}>RAM (Memory)</option>
+                                <option value="SSD" {% if product and product.category == 'SSD' %}selected{% endif %}>Storage - SSD</option>
+                                <option value="HDD" {% if product and product.category == 'HDD' %}selected{% endif %}>Storage - HDD</option>
+                                <option value="PSU" {% if product and product.category == 'PSU' %}selected{% endif %}>Power Supply (PSU)</option>
+                                <option value="Case" {% if product and product.category == 'Case' %}selected{% endif %}>Computer Case</option>
+                                <option value="Cooling" {% if product and product.category == 'Cooling' %}selected{% endif %}>Cooling System</option>
+                                <option value="VGA" {% if product and product.category == 'VGA' %}selected{% endif %}>Graphics Card (VGA)</option>
+                                <option value="Monitor" {% if product and product.category == 'Monitor' %}selected{% endif %}>Monitor</option>
+                                <option value="Accessory" {% if product and product.category == 'Accessory' %}selected{% endif %}>Accessories / Others</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Product Image (Optional)</label>
+                            <input type="file" class="form-control" name="image" accept="image/*">
+                            <small class="text-muted">Allowed types: png, jpg, jpeg, gif</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">                          
+                            <button type="submit" class="btn btn-primary">Save Product</button>
+                            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/lux/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    
+    <div class="mb-4">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-dark">&larr; Back to Dashboard</a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="row g-0">
+                <div class="col-md-4 bg-white d-flex align-items-center justify-content-center p-4 border-end">
+                    {% if product.image_url %}
+                        <img src="{{ url_for('static', filename='uploads/' + product.image_url) }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                    {% else %}
+                        <div class="text-muted p-5 bg-light rounded text-center" style="width: 100%;">
+                            NO IMAGE
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-8 p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge bg-primary mb-2">{{ product.sku }}</span>
+                            <h2 class="fw-bold">{{ product.name }}</h2>
+                        </div>
+                        <h2 class="display-6 {{ 'text-danger' if product.current_quantity < 5 else 'text-success' }}">
+                            {{ product.current_quantity }} <small class="fs-6 text-muted">units</small>
+                        </h2>
+                    </div>
+                    
+                    <p class="text-muted mt-3">{{ product.description }}</p>
+
+                    <hr class="my-4">
+
+                    <div class="text-end">
+                         <a href="{{ url_for('delete_product', product_id=product.id) }}" 
+                            class="btn btn-outline-danger btn-sm"
+                            onclick="return confirm('Are you sure?');">
+                            🗑️ Delete Product
+                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3 text-uppercase tracking-wider">📜 History Log</h4>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Date/Time</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in history %}
+                    <tr>
+                        <td class="ps-4 text-muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if log.transaction_type == 'IN' %}
+                                <span class="badge bg-success rounded-pill">IN (Buy)</span>
+                            {% else %}
+                                <span class="badge bg-danger rounded-pill">OUT (Sell)</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ log.quantity }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">No transactions yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
