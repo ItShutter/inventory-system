@@ -67,10 +67,10 @@ ________________________________________
 **Invoice System:** พิมพ์ใบเสร็จ/ใบส่งของได้ทันทีจากรายการธุรกรรม 
 
 ## 🛠️ Stack ที่ใช้
-**Backend:** Python 3.x, Flask 
-**Database:** SQLite (SQLAlchemy ORM) 
-**Frontend:** HTML5, CSS3, Jinja2, Chart.js 
-**Libraries:** Pandas, Flask-Login, Werkzeug 
+**Backend: Python 3.x, Flask
+**Database: PostgreSQL (รันผ่าน Docker), SQLAlchemy ORM
+**Frontend: HTML5, CSS3 (Bootstrap 5), Jinja2
+**DevOps & Tools: Docker, Docker Compose, Git, VS Code Remote SSH
 
 ## 🚀 การติดตั้ง (Installation)
 
