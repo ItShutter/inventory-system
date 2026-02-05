@@ -19,8 +19,9 @@
    ```bash
    git clone [https://github.com/ItShutter/inventory-system.git](https://github.com/ItShutter/inventory-system.git)
    cd inventory-system
+สร้างและเปิดใช้งาน Virtual Environment การสร้าง venv จะช่วยให้มั่นใจว่า Library จะไม่ตีกับโปรเจกต์อื่น
 
-2. สร้างและเปิดใช้งาน Virtual Environment การสร้าง venv จะช่วยให้มั่นใจว่า Library จะไม่ตีกับโปรเจกต์อื่น
+Bash
 # สร้าง Virtual Environment
 python3 -m venv venv
 
@@ -29,28 +30,20 @@ source venv/bin/activate
 
 # เปิดใช้งาน (Windows)
 # .\venv\Scripts\activate
+ติดตั้ง Libraries ที่จำเป็น
 
-3. ติดตั้ง Libraries ที่จำเป็น
+Bash
 pip install -r requirements.txt
+ตั้งค่าฐานข้อมูล (Database Setup) โปรเจกต์นี้ใช้ PostgreSQL ผ่าน Docker ให้รันคำสั่งต่อไปนี้เพื่อเริ่มฐานข้อมูล:
 
-4.ตั้งค่าฐานข้อมูล (Database Setup) โปรเจกต์นี้ใช้ PostgreSQL ผ่าน Docker ให้รันคำสั่งต่อไปนี้เพื่อเริ่มฐานข้อมูล:
+Bash
 docker-compose up -d
+ตั้งค่า Environment Variables สร้างไฟล์ .env เพื่อเก็บค่าการเชื่อมต่อ Database:
 
-5.ตั้งค่า Environment Variables สร้างไฟล์ .env เพื่อเก็บค่าการเชื่อมต่อ Database:
+Bash
 # ตัวอย่างการสร้างไฟล์ .env (ปรับรหัสผ่านตามที่ตั้งใน docker-compose.yml)
 echo "DATABASE_URI=postgresql://admin:mysecretpassword@localhost:5432/inventory_system" > .env
+เริ่มรันโปรแกรม (Run Application)
 
-6.เริ่มรันโปรแกรม (Run Application)
+Bash
 python app.py
-
-
-
-
-
-
-
-
-
-
-
-
