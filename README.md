@@ -33,4 +33,3 @@
 6.เริ่มรันโปรแกรม (Run Application)
 	python app.py
 
-
